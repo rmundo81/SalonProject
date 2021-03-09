@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 const Container = styled.div`  
     progress{
-        margin-right: 8px;
+        margin-right: 2500px;
     }
 
     progress[value] {
@@ -14,23 +14,22 @@ const Container = styled.div`
 
   .form-center {
     position: absolute !important;
-    left: 25%;
-    right: 25%;
+    left: 75%;
+    right: 75%;
   }
 `;
 
-const ProgressBar = ({ value, max, color, width }) => {
-    console.log("Value = "+value);
+const ProgressBar = () => {
     return(
-        <Container color={color} width={width}>
-            <progress value={value} max={max} />
-            <span>{(value / max) * 100}%</span> 
+        <Container color="lightBk-lue" width="250px">
+            <progress value={100} max={100} />
+            {/* <span>{(value / max) * 100}%</span>  */}
         </Container>
     );
 };
 
 ProgressBar.propTypes = {
-    value: PropTypes.number.isRequired,
+    value: PropTypes.number,
     max: PropTypes.number,
 }
 

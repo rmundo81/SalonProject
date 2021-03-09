@@ -1,7 +1,10 @@
-import React, { useContext,useEffect, useState } from "react";
+import React, { useContext,useEffect, useState, Fragment } from "react";
+import Breadcrump from "react-bootstrap/Breadcrumb";
+// import axios from "axios";
 import { NotificationContext } from "./AppNotificationComponent";
 import {v4} from 'uuid';
 import ProgressBar from "./LoadingIndicator";
+import { useHistory } from "react-router-dom";
 
 
 
@@ -9,6 +12,10 @@ function ChooseService() {
 
     const dispatch = useContext(NotificationContext);
     const [value, setValue] = useState(0);
+    let history = useHistory();
+    // const salonApi = axios.create({
+    //     baseURL:"http://localhost:8080/api/services/retrieveAvailableSalonServices"
+    // })
     
 
 
@@ -36,16 +43,33 @@ function ChooseService() {
 
     const [salonServicesList, setSalonServicesList] = useState([]);
     const [errorMessage, setErrorMessage] = useState(null);
-    const [loadData, setLoadData] = useState(true);    
+    const [loadData, setLoadData] = useState(true);   
+    // const [percentage, setPercentage] = useState(0); 
+
+
+    // const options = {
+    //         onUpLoadProgress: (progressEvent) => {
+    //             const {loaded, total} =  progressEvent;
+    //             let percent = Math.floor(loaded * 100 / total);
+    //             console.log("IWASHERE");
+    //             console.log(` ${loaded}kb of ${total}kb | ${percent}% `);
+    //         }
+    //     };
+
+    // const salonGetApi = async () => {
+    //    await axios.get("http://localhost:8080/api/services/retrieveAvailableSalonServices",options,{
+    //         headers: {  
+    //             'Content-Type': 'application/json',
+    //             'Accept': 'application/json'
+    //            } 
+    //     }).then((response)=>{
+    //         // console.log(options);
+    //         console.log(response.data)
+    //     })
+    // }
 
     useEffect(() => {
-        // const options = {
-        //     onUpLoadProgress: (progressEvent) => {
-        //         const {loaded, total} =  progressEvent;
-        //         let percent = Math.floor(loaded * 100 / total);
-        //         console.log(` ${loaded}kb of ${total}kb | ${percent}% `);
-        //     }
-        // };
+        
         const interval = setInterval(() => {
             setValue((oldValue) => {
               const newValue = oldValue + 10;
@@ -53,10 +77,21 @@ function ChooseService() {
               if (newValue >= 100) {
                 clearInterval(interval);
               }
-              return newValue;
-      
+              return newValue;      
             })
           }, 1000);
+
+
+        // axios.get(salonApi).then(res => {
+        //     console.log(" AXIOS GET = ")
+        //     console.log(res)
+        // })
+
+        
+        // salonGetApi();
+
+
+
         const url = "/api/services/retrieveAvailableSalonServices"; 
         fetch(url, {    
                 method:'GET',        
@@ -74,44 +109,63 @@ function ChooseService() {
             }
             //  console.log("OPTIONS LOG"+options);
             handleNewSuccessNotification();
-            console.log(data);
-                console.log("Data loading with : ", response.statusText);
-            console.log("ID : "+ data[0].id + " name: " +data[0].name);
+            // console.log(" Data From Fetch");
+            // console.log(data);
+            //     console.log("Data loading with : ", response.statusText);
+           
             setSalonServicesList(data);
             setLoadData(false)
            
-            //console.log(" salonServicesList Length == "+data.map( post => {post.name}));
         })
         .catch(error => {
             setErrorMessage(error.toString());
             handleNewErrorNotification(errorMessage);
-            //this.setState({errorMessage: error.toString()});
             console.error("An error occured while retrieving the salon services : ", errorMessage);
         });        
         
       }, []);
+      function bookFor(salon) {
+        // console.log(" Slot ID == " + salon.id + " Slot Selected:" + salon.name);
+        // var paramIdAndSalonName =  salon.name;
+        history.push("/chooseslot/"+salon.id+"/"+salon.name);
+      }
             return(
-            <div>
-                {loadData ? <div><ProgressBar value={100} max={100}/></div> : <div></div>}
-                {salonServicesList.map(salon => {
-                    return (
-                            <div className="card" key={salon.id}>                                                   
-                                <div className="card-deck text-center">
-                                    <div className="card border-dark mb-3" style={{maxWidth: "18rem"}} >
-                                        <div className="card-header" > <h5> {salon.name} </h5></div>
-                                        <div className="card-body text-dark">
-                                            <h1 className="card-title">${salon.price}</h1>
-                                            <p className="card-text">{salon.description}</p>
-                                            <p className="card-text">{salon.timeInMinutes} Minutes</p>
-                                            <a href="#" className="btn btn-outline-primary">Book Now</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>           
-                        )
-                })}
-            </div>
-        );
+              <Fragment>
+                   {loadData ? <div><ProgressBar animated now={100}/></div> : <div></div>}
+                   <div className="row">
+                     <div className="col-12 pl-0">
+                       <Breadcrump>
+                            <Breadcrump.Item  href="#" active>Home</Breadcrump.Item>
+                       </Breadcrump>
+                     </div>
+                   </div>
+                   <div className="grid-container row  text-center">                     
+                      {salonServicesList.map((salon, index) => {
+                          return (
+                            
+                              <div className="card" key={index}  > 
+                                  <div className="card mb-4 shadow-sm"     >                                                   
+                                              <div className="card-header" > 
+                                                <h4 className="my-0 font-weight-normal"> {salon.name} </h4>
+                                              </div>
+                                              <div className="card-body">
+                                                  <h1 className="card-title pricing-card-title">${salon.price} </h1>
+                                                  <ul className="list-unstyled mt-3 mb-4">
+                                                      <li>{salon.description}</li>
+                                                      <li>{salon.timeInMinutes} Minutes</li>
+                                                  </ul>
+                                              </div>
+                                              <div className="card-footer bg-transparent ">
+                                                <button type="button" onClick={(evt) => bookFor(salon)}  className="btn btn-lg btn-block btn-outline-primary">Book Now</button>
+                                              </div>
+                                  </div>           
+                              {/* </div> */}
+                            </div>
+                              )
+                      })}
+                  </div>
+              </Fragment>
+        );        
 }
 
 export default ChooseService;

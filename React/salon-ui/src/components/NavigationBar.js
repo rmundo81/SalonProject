@@ -22,7 +22,7 @@ export const NavigationBar = () => (
   <Styles>
     <Navbar expand="lg">
       <Navbar.Brand href="/">AR Salon & Day Spa</Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav"/>            
+      {/* <Navbar.Toggle aria-controls="basic-navbar-nav"/>             */}
     </Navbar>
   </Styles>
 )
