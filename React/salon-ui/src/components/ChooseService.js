@@ -1,5 +1,5 @@
 import React, { useContext,useEffect, useState, Fragment } from "react";
-import Breadcrump from "react-bootstrap/Breadcrumb";
+// import Breadcrump from "react-bootstrap/Breadcrumb";
 // import axios from "axios";
 import { NotificationContext } from "./AppNotificationComponent";
 import {v4} from 'uuid';
@@ -9,6 +9,8 @@ import { useHistory } from "react-router-dom";
 
 
 function ChooseService() {   
+
+  
 
     const dispatch = useContext(NotificationContext);
     const [value, setValue] = useState(0);
@@ -93,15 +95,17 @@ function ChooseService() {
 
 
         const url = "/api/services/retrieveAvailableSalonServices"; 
-        fetch(url, {    
-                method:'GET',        
-                headers: {  
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json'
-                 }            
+          fetch(url, {    
+                  method:'GET',        
+                  headers: {  
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  }            
         })
         .then(async response => {
             const data = await response.json();
+            console.log("url ChooseService.JS");
+            console.log(url);
             
             if (!response.ok) {
                 const error = (data && data.message) || response.statusText;
@@ -125,45 +129,40 @@ function ChooseService() {
         
       }, []);
       function bookFor(salon) {
-        // console.log(" Slot ID == " + salon.id + " Slot Selected:" + salon.name);
-        // var paramIdAndSalonName =  salon.name;
+         console.log("ChooseService.JS Slot ID == " + salon.id + " Slot Selected:" + salon.name);
+         console.log("ChooseService.JS Description == " + salon.description + " Slot Selected:" + salon.name);
+        const paramNumService =  salon.id;
+        
         history.push("/chooseslot/"+salon.id+"/"+salon.name);
+      //   history.push({
+      //     pathname: "/chooseslot/",
+      //     state: {id: salon.id} 
+      // });
       }
             return(
               <Fragment>
                    {loadData ? <div><ProgressBar animated now={100}/></div> : <div></div>}
-                   <div className="row">
-                     <div className="col-12 pl-0">
-                       <Breadcrump>
-                            <Breadcrump.Item  href="#" active>Home</Breadcrump.Item>
-                       </Breadcrump>
-                     </div>
-                   </div>
-                   <div className="grid-container row  text-center">                     
-                      {salonServicesList.map((salon, index) => {
-                          return (
-                            
-                              <div className="card" key={index}  > 
-                                  <div className="card mb-4 shadow-sm"     >                                                   
-                                              <div className="card-header" > 
-                                                <h4 className="my-0 font-weight-normal"> {salon.name} </h4>
-                                              </div>
-                                              <div className="card-body">
-                                                  <h1 className="card-title pricing-card-title">${salon.price} </h1>
-                                                  <ul className="list-unstyled mt-3 mb-4">
-                                                      <li>{salon.description}</li>
-                                                      <li>{salon.timeInMinutes} Minutes</li>
-                                                  </ul>
-                                              </div>
-                                              <div className="card-footer bg-transparent ">
-                                                <button type="button" onClick={(evt) => bookFor(salon)}  className="btn btn-lg btn-block btn-outline-primary">Book Now</button>
-                                              </div>
-                                  </div>           
-                              {/* </div> */}
+                   <div className="grid-container row  text-center">
+                    {salonServicesList.map((salon, index)=>{
+                        return(
+                            <div key={index} className="card mb-4 shadow-sm">
+                                <div className="card-header" >
+                                    <h4 className="my-0 font-weight-normal">{salon.name}</h4>
+                                </div>
+                                <div className="card-body">
+                                    <h1 className="card-title pricing-card-title">${salon.price} </h1>
+                                    <ul className="list-unstyled mt-3 mb-4">
+                                        <li>{salon.description}</li>
+                                        <li>{salon.timeInMinutes} Minutes</li>
+                                    </ul>
+                                     <div className="card-footer bg-transparent "> 
+                                          <button type="button" onClick={(evt) => bookFor(salon)}  className="btn btn-lg btn-block btn-outline-primary">Book Now</button>
+                                     </div>
+                                </div>
                             </div>
-                              )
-                      })}
-                  </div>
+                        );
+                    })}
+                </div>                   
               </Fragment>
         );        
 }

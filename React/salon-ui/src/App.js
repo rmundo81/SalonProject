@@ -9,36 +9,12 @@ import ProgressBar from "./components/LoadingIndicator";
 import ChooseService from "./components/ChooseService";
 import ChooseSlot from "./components/ChooseSlot";
 import history from './History';
+import PaymentContainer from './components/PaymentContainer';
 // import { messageService  } from "./components/AppNotificationComponent";
 
 export default function App() {
   const [value, setValue] = useState(0);
-  // const dispatch = useContext(NotificationContext);
-
- 
-
-  /* const handleNewSuccessNotification = () => {
-    dispatch({
-      type: "ADD_NOTIFICATION",
-      payload: {
-        id: v4(),
-        type: "SUCCESS",
-        message: "Salon Service Loaded Successfuly"
-      }
-    })
-  }
-
-  const handleNewErrorNotification = () => {
-    dispatch({
-      type: "ADD_NOTIFICATION",
-      payload: {
-        id: v4(),
-        type: "ERROR",
-        message: "An Unexpected Error Occured !"
-      }
-    })
-  } */
-
+  
   useEffect(() => {
     const interval = setInterval(() => {
       setValue((oldValue) => {
@@ -64,9 +40,10 @@ export default function App() {
         <main role="main" className="container">
             <div className="padding-container">
               <Switch>
-                <Route path="/" exact component={ChooseService}/>
-                <Route path="/chooseslot/:serviceId/:serviceName" exact component={ChooseSlot}/>
-                {/* <ChooseService /> */}
+                <Route exact path="/" component={ChooseService}/> 
+                <Route exact path="/chooseslot/:serviceId/:serviceName" component={ChooseSlot}/> 
+                <Route exact path="/makepayment/:slotId/:serviceId/:serviceName" component={PaymentContainer}/>
+                <Route path="/" component={ChooseService}/>
               </Switch>
             </div>
         </main>

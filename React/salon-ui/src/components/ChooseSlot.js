@@ -1,5 +1,5 @@
 import React, {useContext,useEffect,Fragment, useState} from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { NotificationContext } from "./AppNotificationComponent";
@@ -7,79 +7,73 @@ import ProgressBar from "./LoadingIndicator";
 import {v4} from 'uuid';
 import Moment  from 'moment';
 
-// import 'date-fns';
-// import Grid from '@material-ui/core/Grid';
-// import DateFnsUtils from '@date-io/date-fns';
-// import {
-//     MuiPickersUtilsProvider,
-//     KeyboardTimePicker,
-//     KeyboardDatePicker,
-// } from '@material-ui/pickers';
 
-
-const ChooseSlot = () => {
-
-    // let newDate = new Date()
+function ChooseSlot (props) {
     var currentDate = new Date();
     currentDate.setDate(currentDate.getDate());
-    const [selectedDate, setSelectedDate] = useState(currentDate)
+    const [showDate2, setShowDate2] = useState(Moment(currentDate).format('yyyy-MM-DD'));
+    let history = useHistory();
+    console.log("showDate2 =" + showDate2);
+
+    const [selectedDate, setSelectedDate] = useState(currentDate);
     const [errorMessage, setErrorMessage] = useState(null);
     const [slotAvailableList, setSlotAvailableList] = useState([]);
     const [loadData, setLoadData] = useState(true);  
-    const {slotId, serviceName} = useParams();
-    console.log(" Slot ID == " + slotId + " Slot Selected:" + serviceName);
+    const [loadProgreBar, setLoadProgreBar] = useState(true);  
+    const {serviceId, serviceName} = useParams();
+    console.log(" Slot ID == " + serviceId + " Slot Selected:" + serviceName);
     const dispatch = useContext(NotificationContext);
-
+    
     const handleNewErrorNotification = (errMsg) => {
+        setLoadData(false);
+        setLoadProgreBar(false);
         dispatch({
           type: "ADD_NOTIFICATION",
           payload: {
             uuid: v4(),
             type: "ERROR",
-            message: "No Past Date Allowed : " + errMsg + " !"
+            message: "An Unexpected Error Occured : " + errMsg + " !"
           }
         })
       }
 
-      const handleNewSuccessNotification = () => {
+    const handleNewSuccessNotification = () => {
+        setLoadData(true);
+        setLoadProgreBar(true);
         dispatch({
-          type: "ADD_NOTIFICATION",
-          payload: {
+        type: "ADD_NOTIFICATION",
+        payload: {
             uuid: v4(),
             type: "SUCCESS",
             message: "Slots Available Loaded Successfuly"
-          }
+        }
         })
-      }
+    }
 
     const handleChangeDate = (newDate) => {
-        // var userSelectedDate2 = new Date(newDate); //dd-mm-YYYY
-        // console.log("newDate 22 == "+ Moment(userSelectedDate2).format('yyyy-MM-DD'));
         var userSelectedDate = new Date(newDate); //dd-mm-YYYY
         var today = new Date();
         today.setHours(0,0,0,0);
         
         if(userSelectedDate < today) {        
-        //Do something..
-            // alert("Working!");
-            handleNewErrorNotification(userSelectedDate);
+            handleNewErrorNotification("No Past Date Allowed");
         } else {
-            setSelectedDate(newDate);
-            console.log("newDate == "+newDate);
+            setSelectedDate(newDate);            
         }
     };
     
    
     useEffect(()=> {
-        showSlotSubmit(selectedDate);
+        showSlotSubmit();
     },[]);
 
-    const showSlotSubmit = async (selectedDate2) => {
-        // const url = "/api/services/retrieveAvailableSlots/" + id + "/" + serviceName;         
-        const dateParram = Moment(selectedDate2).format('yyyy-MM-DD')
-        // console.log("newDate 22 == "+ Moment(userSelectedDate2).format('yyyy-MM-DD'));
-        const url = `/api/services/retrieveAvailableSlots/${slotId}/${dateParram}`; 
+    const showSlotSubmit = async () => {        
+
+        const dateParram = Moment(selectedDate).format('yyyy-MM-DD');
+        const url = `/api/services/retrieveAvailableSlots/${serviceId}/${dateParram}`; 
         console.log('URL='+url);
+
+        setShowDate2(Moment(selectedDate).format('yyyy-MM-DD'));       
 
         fetch(url, {    
             method:'GET',        
@@ -93,13 +87,14 @@ const ChooseSlot = () => {
         
         if (!response.ok) {
             const error = (data && data.message) || response.statusText;
+            setLoadData(false);
             return Promise.reject(error);
         } else {
             handleNewSuccessNotification();           
             setSlotAvailableList(data);
-            setLoadData(false)
-        }
-       
+            setLoadData(true)
+            setLoadProgreBar(false);                       
+        }       
     })
     .catch(error => {
         setErrorMessage(error.toString());
@@ -108,15 +103,16 @@ const ChooseSlot = () => {
     });
     }
     
-    function showSlotsAvailable() {
-       // history.push("/chooseslot/"+ salon.id+ "/"+ salon.name)
-    //    var dateParram = Moment(selectedDate.format('YYYY-MM-DD'));
-       
-       showSlotSubmit(slotId);
-      }
+    function showSlotsAvailable() {       
+       showSlotSubmit();
+    }
 
-    function bookFor(salon) {
-        // history.push("/chooseslot/"+ salon.id+ "/"+ salon.name)
+    function bookFor(slot) {
+        console.log("Slot ID/serviceId/serviceName");
+        console.log(slot.id);
+        console.log(serviceId);
+        console.log(serviceName);
+        history.push("/makepayment/"+slot.id+"/"+serviceId+"/"+serviceName);
     }
 
     // function convertToTime(time) {
@@ -144,10 +140,10 @@ const ChooseSlot = () => {
                 <button type="button" onClick={(evt) => showSlotsAvailable()}  className="btn btn-primary">Show Slots</button>
              </div>
              <div>
-             {loadData ? <div><ProgressBar animated now={100}/></div> : <div></div>}
+             {loadProgreBar ? <div><ProgressBar animated now={100}/></div> : <div></div>}
              <p></p>
              <p></p>
-             <h2 className="my-0 font-weight-normal">Available Slots on {serviceName} </h2>             
+             {loadData ? <h2 className="my-0 font-weight-normal">Available Slots on {showDate2}  </h2>: <div></div>}
              <div className="grid-container row  text-center">                     
                       {slotAvailableList.map((slot, index) => {
                           return (
@@ -164,8 +160,9 @@ const ChooseSlot = () => {
                                                       <li>Slot Time {slot.slotFor}</li>
                                                   </ul>
                                               </div>
-                                              <div class="card-footer bg-transparent ">
+                                              <div className="card-footer bg-transparent ">
                                                 <button type="button" onClick={(evt) => bookFor(slot)}  className="btn btn-lg btn-block btn-outline-primary">Book This Slot</button>
+                                                {/* <button variant="primary" href={"/makepayment/"+slot.id+"/"+serviceId+"/"+serviceName} >Book This Slot</button> */}
                                               </div>
                                   </div>           
                               {/* </div> */}

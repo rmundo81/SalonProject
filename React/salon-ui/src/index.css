@@ -11,3 +11,19 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.padding-container {
+  padding: 3rem 1.5rem;
+}
+
+.grid-container .card{
+  margin-right: 3vw;
+  margin-bottom: 3vh;
+  width: 15vw;
+  max-width: 15vw;
+
+}
+/* 
+.card-header {
+  border-bottom-width: 55px;
+} */
