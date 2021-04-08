@@ -2,7 +2,6 @@ package com.salon.api.slot;
 
 import com.salon.api.salonservice.SalonServiceDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +38,10 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
 
 //    Mono<Slot> findById(Long id);
     Optional<Slot> findById(Long id);
+
+    Slot findSlotsByIdAndAvailableServicesAndStatus(Long id, SalonServiceDetail salonServiceDetail, Slot.SlotStatus status);
 //    Mono<Slot> findByIdAndStatus(Long id, int slotStatus);
-    Optional<Slot> findByIdAndStatus(Long id, int slotStatus);
+    //    Optional<Slot> findByIdAndStatus(Long id, int slotStatus);
 
 
 

@@ -27,37 +27,33 @@ public class Slot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int status;
+    //private int status;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     //@Transient
     Set<SalonServiceDetail> availableServices;
 
-
     @ManyToOne
     // @Column(value = "selected_service_id")
     private SalonServiceDetail selectedServiceId;
 
     String stylistName;
-
-
     LocalDateTime slotFor;
-
-
     LocalDateTime lockedAt;
     LocalDateTime confirmedAt;
+    SlotStatus status;
 
 
-    public SlotStatus getStatus() {
-        return SlotStatus.values()[status];
-    }
+    //public SlotStatus getStatus() {
+        //return SlotStatus.values()[status];
+    //}
 
-    public void setStatus(SlotStatus status) {
-        this.status = status.ordinal();
-    }
+    //public void setStatus(SlotStatus status) {
+      //      this.status = status.ordinal();
+        //}
+
+public enum  SlotStatus {
+    AVAILABLE,LOCKED,CONFIRMED,CANCELLED
 }
-
-//enum  SlotStatus {
-//    AVAILABLE,LOCKED,CONFIRMED,CANCELLED
-//}
+}

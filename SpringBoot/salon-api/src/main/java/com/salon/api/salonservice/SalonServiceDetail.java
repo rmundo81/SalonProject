@@ -1,7 +1,7 @@
 package com.salon.api.salonservice;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.Entity;
@@ -12,17 +12,18 @@ import javax.persistence.Id;
 
 @Entity
 @Data
-@NoArgsConstructor
+@RequiredArgsConstructor
+//@NoArgsConstructor
 @ToString
 public class SalonServiceDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String name;
-    String description;
-    Long price;
-    Integer timeInMinutes;
+     Long id;
+     String name;
+     String description;
+     Long price;
+     Integer timeInMinutes;
 
 //    public SalonServiceDetail(String name, String description, Long price, Integer timeInMinutes) {
 //        this.name = name;
