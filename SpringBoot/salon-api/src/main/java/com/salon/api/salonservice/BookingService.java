@@ -1,6 +1,5 @@
 package com.salon.api.salonservice;
 
-import com.salon.api.common.SalonException;
 import com.salon.api.config.SalonDetails;
 import com.salon.api.payment.ConfirmationResponse;
 import com.salon.api.payment.Payment;
@@ -14,7 +13,9 @@ import com.salon.api.slot.Slot;
 import com.salon.api.slot.SlotRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -39,11 +40,13 @@ public class BookingService {
 
     public Payment createPayment(PaymentRequest paymentRequest) {
         // check salonServiceDetailID
-        SalonServiceDetail salonServiceDetail =salonServiceDetailRepository.findById(paymentRequest.getSalonServiceDetailID()).orElseThrow(()-> new SalonException("Invalid SalonService ID !"));
+        SalonServiceDetail salonServiceDetail =salonServiceDetailRepository.
+                findById(paymentRequest.getSalonServiceDetailID()).
+                    orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid SalonService ID !",null));
         log.info("// check salonServiceDetailID");
 
         // Find slot available with status available
-        Slot slot = Optional.ofNullable(slotRepository.findSlotsByIdAndAvailableServicesAndStatus(paymentRequest.getSlotID(),salonServiceDetail, Slot.SlotStatus.AVAILABLE)).orElseThrow(()-> new SalonException("Slot invalid or unavailable"));
+        Slot slot = Optional.ofNullable(slotRepository.findSlotsByIdAndAvailableServicesAndStatus(paymentRequest.getSlotID(),salonServiceDetail, Slot.SlotStatus.AVAILABLE)).orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Slot invalid or unavailable",null));
         log.info("// Find slot available with status available");
 
         // Create Intent with Stripe
@@ -72,17 +75,17 @@ public class BookingService {
     public ConfirmationResponse confirmPayment(Long id) {
         // Check if payment status is success
         Payment payment = paymentRepository.findById(id).orElseThrow(
-                ()-> new SalonException("Invalid Payment !"));
+                ()-> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid Payment !",null));
         log.info("payment status :"+payment.getStatus());
         log.info("payment Enum status :"+Payment.PaymentStatus.SUCCESS);
         if (payment.getStatus() == Payment.PaymentStatus.SUCCESS) {
-            throw new SalonException("Payment already confirmed");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Payment already confirmed",null);
         }
         // Check if Stripe return error not successful
         log.info("payment status Stripe return :"+payment.getIntendID());
         log.info("payment Enum status :"+Payment.PaymentStatus.SUCCESS);
         if (!stripePaymentService.IsPaymentSuccessful(payment.getIntendID())) {
-            throw new SalonException("Payment not successful");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Payment not successful",null);
         }
         // Create a ticket
         Ticket ticket = Ticket.builder()
@@ -111,6 +114,6 @@ public class BookingService {
 
     public Ticket getTicket(Long id) {
         return ticketRepository.findById(id)
-                .orElseThrow(()-> new SalonException("Ticket not valid")  );
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Ticket not valid",null));
     }
 }

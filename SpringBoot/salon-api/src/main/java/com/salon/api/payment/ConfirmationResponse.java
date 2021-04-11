@@ -7,9 +7,6 @@ import lombok.Data;
 @Data
 @Builder
 public class ConfirmationResponse {
-
     SalonDetails salonDetails;
-
     Ticket ticket;
-
 }
