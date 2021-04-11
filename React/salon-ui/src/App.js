@@ -10,6 +10,7 @@ import ChooseService from "./components/ChooseService";
 import ChooseSlot from "./components/ChooseSlot";
 import history from './History';
 import PaymentContainer from './components/PaymentContainer';
+import VerifyUser from './components/VerifyUser';
 // import { messageService  } from "./components/AppNotificationComponent";
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
                 <Route exact path="/" component={ChooseService}/> 
                 <Route exact path="/chooseslot/:serviceId/:serviceName" component={ChooseSlot}/> 
                 <Route exact path="/makepayment/:slotId/:serviceId/:serviceName" component={PaymentContainer}/>
+                <Route exact path="/admin/verifyuser" component={VerifyUser}/>
                 <Route path="/" component={ChooseService}/>
               </Switch>
             </div>

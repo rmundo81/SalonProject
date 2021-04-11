@@ -4,9 +4,8 @@ import React, { Fragment, useState, useEffect, useContext} from "react";
 import QRCode  from 'qrcode.react';
 import moment from 'moment';
 import { NotificationContext } from "./AppNotificationComponent";
-import ProgressBar from "./LoadingIndicator";
 import {v4} from 'uuid';
-
+import { handleHttpErrors } from "../common/HttpHelper";
 
 function ShowConfirmedTicket (props) {
 console.log("ShowConfirmedTicket...Props stripePaymentID");
@@ -57,6 +56,7 @@ const handleNewErrorNotification = (errMsg) => {
     function fetchConfirmPayment() {
         console.log("fetchConfirmPayment...");
         fetch(url + paymentId, requestOptions)
+        .then( res=> handleHttpErrors(res))
         .then(async response =>{
             try {
                 const data = await response.json()
@@ -101,27 +101,31 @@ function onPaymentConfirmed(confirm) {
 }
 
     return( 
-        <Fragment>            
+        
+        <Fragment>                       
             { !loadData ? <div/> :
-            <div>                
                 <div>
-                    <h2>Your Ticket Details</h2>
-                    <h4>Service Details</h4>
-                    {ticketInfo.selectedServiceName} @ {ticketInfo.dateSlotFor} by {ticketInfo.slotStylistName}
-                    <br/>
-                    <h4>Salon Address Details</h4>    
-                        <p>
-                             {salonInfo.name}                         
-                            <br/> {salonInfo.address}                         
-                            <br/> {salonInfo.city}                         
-                            <br/> {salonInfo.state}                        
-                            <br/> Zip {salonInfo.zipcode}                        
-                            <br/>Phone {salonInfo.phone} 
-                        </p>                    
-                    <h4>Take a Picture of the below code and present it to Admin </h4>
-                    <QRCode value={ticketInfo.ticketUrl} />
+                    <h3>Your Ticket Details</h3>
+                    <div className="row">
+                        <div className="col-6"> 
+                            <strong> Service Details</strong>
+                            <div>{ticketInfo.selectedServiceName} @ {ticketInfo.dateSlotFor} by {ticketInfo.slotStylistName} </div>
+                            <hr/>
+                            <br/>
+                            <strong> Salon Address Details</strong>                               
+                                <div> {salonInfo.name} </div>                        
+                                <div> {salonInfo.address} </div>                        
+                                <div> {salonInfo.city} </div>                 
+                                <div> {salonInfo.state} </div>                  
+                                <div> Zip {salonInfo.zipcode} </div>                       
+                                <div>Phone {salonInfo.phone} </div>                          
+                        </div>
+                        <div className="col-6">                  
+                            <strong> Take a Picture of the below code and present it to Admin </strong>                        
+                                <QRCode value={ticketInfo.ticketUrl} />
+                        </div>
+                    </div>
                 </div>
-            </div>
             }
             
         </Fragment>
